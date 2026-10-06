@@ -32,6 +32,28 @@ app.get('/health', async (_req, res) => {
   }
 })
 
+app.get('/db-check', async (_req, res) => {
+  try {
+    const result = await db.query(`
+      SELECT table_schema, table_name
+      FROM information_schema.tables
+      WHERE table_schema = 'mutual_fund'
+      ORDER BY table_name
+    `)
+
+    res.json({
+      status: 'ok',
+      tables: result.rows,
+    })
+  } catch (error) {
+    console.error(error)
+
+    res.status(500).json({
+      status: 'error',
+    })
+  }
+})
+
 app.listen(PORT, () => {
   console.log(`Tools API running on http://localhost:${PORT}`)
 })
