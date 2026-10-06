@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1180" viewBox="0 0 1440 1180" role="img" aria-labelledby="title description">
+  <title id="title">Taxpreco Phase 1 architecture</title>
+  <desc id="description">React demo frontend on port 5173 connects to an Express TypeScript integration API on port 3001. Health and tools endpoints are public. The me endpoint uses a development-only mock or fails closed pending real Alpha JWT verification. Entity comparison uses in-memory state. No database, persistence, file processing, external AI or PDF generation exists in Phase 1.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10z" fill="#52746d"/></marker>
+    <style>
+      text { font-family: 'Segoe UI', Arial, sans-serif; fill: #17352f; }
+      .title { font-size: 34px; font-weight: 700; }
+      .subtitle { font-size: 18px; fill: #56716a; }
+      .label { font-size: 14px; font-weight: 700; letter-spacing: 1.4px; fill: #3e7165; }
+      .heading { font-size: 20px; font-weight: 700; }
+      .body { font-size: 16px; }
+      .small { font-size: 14px; fill: #56716a; }
+      .mono { font-family: Consolas, monospace; font-size: 16px; }
+      .box { fill: white; stroke: #c8d8d1; stroke-width: 1.5; }
+      .flow { fill: none; stroke: #52746d; stroke-width: 2; marker-end: url(#arrow); }
+      .future { stroke-dasharray: 6 5; }
+    </style>
+  </defs>
+  <rect width="1440" height="1180" fill="#f6f8f5"/>
+  <text x="60" y="62" class="label">PHASE 1 · IMPLEMENTED BOUNDARIES</text>
+  <text x="60" y="108" class="title">Taxpreco tools architecture</text>
+  <text x="60" y="143" class="subtitle">Preserved Entity Comparison demo + advisory dashboard + minimal integration API</text>
+
+  <rect x="60" y="200" width="630" height="790" rx="18" fill="#eaf1eb" stroke="#c1d3c7" stroke-width="1.5"/>
+  <text x="86" y="237" class="label">BROWSER · REACT + VITE + TYPESCRIPT</text>
+  <rect x="86" y="262" width="578" height="100" rx="12" class="box"/>
+  <text x="110" y="296" class="heading">App.tsx · Tapreco application shell</text>
+  <text x="110" y="326" class="body">Navigation, demo client/year selection and dialogs</text>
+  <text x="110" y="349" class="small">Frontend: localhost:5173 · strict development port</text>
+  <path d="M255 362 V410" class="flow"/>
+  <path d="M530 362 V410" class="flow"/>
+
+  <rect x="86" y="410" width="280" height="180" rx="12" class="box"/>
+  <text x="108" y="447" class="heading">Advisory dashboard</text>
+  <text x="108" y="480" class="body">Entity Comparison</text>
+  <text x="108" y="506" class="body">Single Phase 1 tool entry</text>
+  <text x="108" y="545" class="small">Open the sample workspace</text>
+  <text x="108" y="569" class="small">Catalog + connection status</text>
+  <rect x="390" y="410" width="274" height="180" rx="12" class="box"/>
+  <text x="412" y="447" class="heading">Entity Comparison</text>
+  <text x="412" y="480" class="body">Scenario Grid · Comparison</text>
+  <text x="412" y="506" class="body">Rule-based AI Review</text>
+  <text x="412" y="545" class="small">Editable assumptions + KPIs</text>
+  <text x="412" y="569" class="small">Report selection and preview</text>
+  <path d="M225 590 V646" class="flow"/>
+  <path d="M530 590 V618 H678 V849 H664" class="flow"/>
+
+  <rect x="86" y="646" width="578" height="105" rx="12" class="box"/>
+  <text x="110" y="681" class="heading">src/api/client.ts</text>
+  <text x="110" y="712" class="body">GET health / tools / me · optional bearer-token input</text>
+  <text x="110" y="737" class="small">/api proxy locally; public API base URL for separate hosting</text>
+  <path d="M664 700 H780" class="flow"/>
+  <text x="721" y="660" text-anchor="middle" class="small">HTTP GET</text>
+  <text x="721" y="680" text-anchor="middle" class="small">Exact CORS</text>
+
+  <rect x="86" y="795" width="578" height="154" rx="12" fill="#fff8e9" stroke="#ddc995" stroke-width="1.5"/>
+  <text x="110" y="832" class="heading">React state + sample TypeScript data</text>
+  <text x="110" y="865" class="body">Inputs, scenarios, CPA notes and selected review cards</text>
+  <text x="110" y="898" class="small">Refresh or client/year selection resets demo edits</text>
+  <text x="110" y="924" class="small">Local arithmetic only · no localStorage or server persistence</text>
+
+  <rect x="780" y="200" width="600" height="162" rx="14" fill="white" stroke="#9db7ac" stroke-width="1.5" stroke-dasharray="7 5"/>
+  <text x="806" y="237" class="label">ALPHA / MAIN TAPRECO APPLICATION</text>
+  <text x="806" y="275" class="heading">Owns login and token issuance</text>
+  <text x="806" y="306" class="body">Future token handoff and JWT verification contract</text>
+  <text x="806" y="336" class="small">Issuer · audience · JWKS URL · allowed origin · token delivery</text>
+  <path d="M780 300 H664" class="flow future"/>
+  <text x="721" y="270" text-anchor="middle" class="small">Future</text>
+  <path d="M1080 362 V410" class="flow future"/>
+
+  <rect x="780" y="410" width="600" height="580" rx="18" fill="#eaf1eb" stroke="#c1d3c7" stroke-width="1.5"/>
+  <text x="806" y="447" class="label">SERVER · NODE + EXPRESS + TYPESCRIPT</text>
+  <text x="806" y="476" class="small">Integration API: localhost:3001 · optional static frontend hosting</text>
+  <rect x="806" y="503" width="548" height="111" rx="12" class="box"/>
+  <text x="830" y="538" class="heading">Public integration endpoints</text>
+  <text x="830" y="569" class="mono">GET /api/health → service liveness</text>
+  <text x="830" y="594" class="mono">GET /api/tools → catalog metadata</text>
+
+  <rect x="806" y="646" width="548" height="105" rx="12" class="box"/>
+  <text x="830" y="681" class="heading">GET /api/me → auth middleware</text>
+  <text x="830" y="712" class="body">AUTH_MODE selects the integration boundary</text>
+  <text x="830" y="737" class="small">Never trust decoded claims or accept unverified bearer tokens</text>
+  <path d="M947 751 V797" class="flow"/>
+  <path d="M1214 751 V797" class="flow"/>
+
+  <rect x="806" y="797" width="263" height="152" rx="12" class="box"/>
+  <text x="826" y="832" class="heading">Development mock</text>
+  <text x="826" y="865" class="body">Fake Demo Advisor identity</text>
+  <text x="826" y="896" class="small">Loopback host only</text>
+  <text x="826" y="922" class="small">Production startup rejects mock</text>
+  <rect x="1091" y="797" width="263" height="152" rx="12" fill="#fff8e9" stroke="#ddc995" stroke-width="1.5"/>
+  <text x="1111" y="832" class="heading">JWT mode · pending</text>
+  <text x="1111" y="865" class="body">No verifier implemented yet</text>
+  <text x="1111" y="896" class="small">401: bearer token missing</text>
+  <text x="1111" y="922" class="small">503: verification unavailable</text>
+
+  <rect x="60" y="1022" width="1320" height="62" rx="10" fill="#e1e9e5"/>
+  <text x="720" y="1050" text-anchor="middle" style="font-size:17px;font-weight:600">Database: none · Persistent storage: none · External AI / tax engine: none</text>
+  <text x="720" y="1073" text-anchor="middle" class="small">Deferred: document processing, PDF generation, advanced structures and production authorization</text>
+  <text x="60" y="1122" class="small">Build preview: 4173 · Browser test frontend: 5199 / backend: 3002 · Production URLs depend on hosting.</text>
+  <text x="60" y="1150" class="small">Solid arrows = implemented flow. Dashed arrows = future integration. See README.md and ARCHITECTURE_AUDIT.md.</text>
+</svg>

@@ -4,37 +4,19 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "preview": "vite preview",
-    "test:e2e": "playwright test"
-  },
-  "dependencies": {
-    "exceljs": "^4.4.0",
-    "jspdf": "^4.2.1",
-    "pdfjs-dist": "^6.4.299",
-    "react": "^19.2.8",
-    "react-dom": "^19.2.8"
+    "setup": "npm --prefix apps/entity-comparison-web ci && npm --prefix services/entity-comparison-api ci",
+    "dev": "concurrently --kill-others --names API,WEB \"npm run dev:server\" \"npm run dev:frontend\"",
+    "dev:frontend": "npm --prefix apps/entity-comparison-web run dev --",
+    "build": "npm --prefix apps/entity-comparison-web run build",
+    "lint": "npm --prefix apps/entity-comparison-web run lint && npm --prefix services/entity-comparison-api run lint",
+    "preview": "npm --prefix apps/entity-comparison-web run preview --",
+    "test:e2e": "npm --prefix apps/entity-comparison-web run test:e2e --",
+    "dev:server": "npm --prefix services/entity-comparison-api run dev --",
+    "build:server": "npm --prefix services/entity-comparison-api run build",
+    "start:server": "npm --prefix services/entity-comparison-api run start --",
+    "test:api": "npm --prefix services/entity-comparison-api run test"
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
-    "@playwright/test": "^1.63.0",
-    "@types/node": "^24.13.3",
-    "@types/react": "^19.2.18",
-    "@types/react-dom": "^19.2.7",
-    "@vitejs/plugin-react": "^6.1.1",
-    "eslint": "^10.10.0",
-    "eslint-plugin-react-hooks": "^7.1.1",
-    "eslint-plugin-react-refresh": "^0.5.6",
-    "globals": "^17.12.0",
-    "typescript": "~6.0.2",
-    "typescript-eslint": "^8.69.0",
-    "vite": "^8.3.0"
-  },
-  "overrides": {
-    "exceljs": {
-      "uuid": "^11.1.1"
-    }
+    "concurrently": "^10.0.5"
   }
 }
