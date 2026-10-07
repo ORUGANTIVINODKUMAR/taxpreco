@@ -1,6 +1,10 @@
+
 import './App.css'
 
+
 function App() {
+
+
   return (
     <div className="app-shell">
       <aside className="sidebar">
@@ -38,14 +42,20 @@ function App() {
         <main className="content">
           <section className="page-heading">
             <div>
-              <div className="eyebrow">Federal and multistate planning</div>
+              <div className="eyebrow">
+                Federal and multistate planning
+              </div>
+
               <h1>Quarterly Estimated Tax Worksheet</h1>
+
               <p>
                 Review federal and state planning inputs for the selected quarter.
               </p>
             </div>
 
-            <button className="primary-button">Prepare Client Report</button>
+            <button className="primary-button">
+              Prepare Client Report
+            </button>
           </section>
 
           <section className="toolbar">
@@ -77,7 +87,9 @@ function App() {
               </select>
             </label>
 
-            <button className="secondary-button">+ Add State</button>
+            <button className="secondary-button">
+              + Add State
+            </button>
           </section>
 
           <section className="panel">
@@ -87,7 +99,9 @@ function App() {
                 <p>Placeholder worksheet layout for Phase 1.</p>
               </div>
 
-              <button className="secondary-button">Upload Return or P&amp;L</button>
+              <button className="secondary-button">
+                Upload Return or P&amp;L
+              </button>
             </div>
 
             <div className="table-wrapper">
@@ -108,23 +122,41 @@ function App() {
 
                   <tr>
                     <td>Prior-year total tax</td>
-                    <td><input placeholder="$0" /></td>
-                    <td><input placeholder="$0" /></td>
-                    <td><input placeholder="$0" /></td>
+                    <td>
+                      <input placeholder="$0" />
+                    </td>
+                    <td>
+                      <input placeholder="$0" />
+                    </td>
+                    <td>
+                      <input placeholder="$0" />
+                    </td>
                   </tr>
 
                   <tr>
                     <td>Prior-year AGI</td>
-                    <td><input placeholder="$0" /></td>
-                    <td><input placeholder="$0" /></td>
-                    <td><input placeholder="$0" /></td>
+                    <td>
+                      <input placeholder="$0" />
+                    </td>
+                    <td>
+                      <input placeholder="$0" />
+                    </td>
+                    <td>
+                      <input placeholder="$0" />
+                    </td>
                   </tr>
 
                   <tr>
                     <td>Safe-harbor percentage</td>
-                    <td><input placeholder="%" /></td>
-                    <td><input placeholder="%" /></td>
-                    <td><input placeholder="%" /></td>
+                    <td>
+                      <input placeholder="%" />
+                    </td>
+                    <td>
+                      <input placeholder="%" />
+                    </td>
+                    <td>
+                      <input placeholder="%" />
+                    </td>
                   </tr>
 
                   <tr className="section-row">
@@ -133,9 +165,15 @@ function App() {
 
                   <tr>
                     <td>Projected current-year tax</td>
-                    <td><input placeholder="$0" /></td>
-                    <td><input placeholder="$0" /></td>
-                    <td><input placeholder="$0" /></td>
+                    <td>
+                      <input placeholder="$0" />
+                    </td>
+                    <td>
+                      <input placeholder="$0" />
+                    </td>
+                    <td>
+                      <input placeholder="$0" />
+                    </td>
                   </tr>
 
                   <tr className="section-row">
@@ -144,16 +182,28 @@ function App() {
 
                   <tr>
                     <td>W-2 withholding</td>
-                    <td><input placeholder="$0" /></td>
-                    <td><input placeholder="$0" /></td>
-                    <td><input placeholder="$0" /></td>
+                    <td>
+                      <input placeholder="$0" />
+                    </td>
+                    <td>
+                      <input placeholder="$0" />
+                    </td>
+                    <td>
+                      <input placeholder="$0" />
+                    </td>
                   </tr>
 
                   <tr>
                     <td>Prior estimated payments</td>
-                    <td><input placeholder="$0" /></td>
-                    <td><input placeholder="$0" /></td>
-                    <td><input placeholder="$0" /></td>
+                    <td>
+                      <input placeholder="$0" />
+                    </td>
+                    <td>
+                      <input placeholder="$0" />
+                    </td>
+                    <td>
+                      <input placeholder="$0" />
+                    </td>
                   </tr>
 
                   <tr className="total-row">
@@ -191,8 +241,12 @@ function App() {
             </div>
 
             <div className="panel highlight-panel">
-              <div className="eyebrow">Payroll Adjustment</div>
+              <div className="eyebrow">
+                Payroll Adjustment
+              </div>
+
               <h2>W-4 Withholding Recommendation</h2>
+
               <p>
                 This section is a Phase 1 placeholder. No withholding calculations
                 are connected yet.
@@ -210,9 +264,18 @@ function App() {
                     <option value="" disabled>
                       Select method
                     </option>
-                    <option>Extra withholding per paycheck</option>
-                    <option>Estimated tax payments</option>
-                    <option>Combination</option>
+
+                    <option>
+                      Extra withholding per paycheck
+                    </option>
+
+                    <option>
+                      Estimated tax payments
+                    </option>
+
+                    <option>
+                      Combination
+                    </option>
                   </select>
                 </label>
               </div>
@@ -220,8 +283,13 @@ function App() {
           </section>
 
           <div className="page-actions">
-            <button className="secondary-button">Save Scenario</button>
-            <button className="primary-button">Generate Payment Plan</button>
+            <button className="secondary-button">
+              Save Scenario
+            </button>
+
+            <button className="primary-button">
+              Generate Payment Plan
+            </button>
           </div>
         </main>
       </div>
