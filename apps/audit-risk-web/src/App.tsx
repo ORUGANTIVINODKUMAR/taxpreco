@@ -1,15 +1,25 @@
 import { useRef, useState } from 'react'
 import './App.css'
-import { apiRequest } from './api'
+import { getLaunchContext } from './launchContext'
+
 type Tab = 'worksheet' | 'comparison' | 'ai'
 
 function App() {
+  const launchContext = getLaunchContext()
+
+  const initialTaxYear = launchContext.taxYear || '2026'
+  const initialClientId = launchContext.clientId || 'sample-client'
+
   const [activeTab, setActiveTab] = useState<Tab>('worksheet')
   const [showReport, setShowReport] = useState(false)
   const [selectedFileName, setSelectedFileName] = useState('')
+  const [selectedClientId, setSelectedClientId] =
+    useState(initialClientId)
+  const [taxYear, setTaxYear] = useState(initialTaxYear)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
-  
+
+  const standardYears = ['2026', '2025', '2024']
 
   return (
     <div className="audit-app">
@@ -19,13 +29,19 @@ function App() {
           <span>tapreco</span>
         </div>
 
-        <p className="sidebar-label">ADVISORY WORKSPACE</p>
+        <p className="sidebar-label">
+          ADVISORY WORKSPACE
+        </p>
 
         <nav className="sidebar-nav">
           <button>Overview</button>
           <button>Income Tax Planner</button>
           <button>Retirement Distribution Planner</button>
-          <button className="active">Audit Risk Analyzer</button>
+
+          <button className="active">
+            Audit Risk Analyzer
+          </button>
+
           <button>Structure Advisor</button>
           <button>Client Files</button>
           <button>Settings</button>
@@ -49,13 +65,15 @@ function App() {
         <main className="main-content">
           <section className="page-heading">
             <div>
-              <span className="eyebrow">COMPLIANCE & RISK</span>
+              <span className="eyebrow">
+                COMPLIANCE &amp; RISK
+              </span>
 
               <h1>Audit Risk Analyzer</h1>
 
               <p>
-                Review federal return information, identify potential audit-risk
-                factors, and prepare documentation scenarios.
+                Review federal return information, identify potential
+                audit-risk factors, and prepare documentation scenarios.
               </p>
             </div>
 
@@ -77,21 +95,41 @@ function App() {
           </section>
 
           <div className="phase-banner">
-            <strong>Phase 1 preview:</strong> PDF import, scoring, calculations,
-            AI analysis, and API integration are placeholders only.
+            <strong>Phase 1 preview:</strong> PDF import, scoring,
+            calculations, AI analysis, and API integration are
+            placeholders only.
           </div>
 
           <section className="toolbar">
             <label>
               CLIENT
-              <select>
-                <option>Sample Client</option>
-                <option>New Client</option>
+
+              <select
+                value={selectedClientId}
+                onChange={(event) =>
+                  setSelectedClientId(event.target.value)
+                }
+              >
+                {selectedClientId !== 'sample-client' &&
+                  selectedClientId !== 'new-client' && (
+                    <option value={selectedClientId}>
+                      Tapreco Client ({selectedClientId})
+                    </option>
+                  )}
+
+                <option value="sample-client">
+                  Sample Client
+                </option>
+
+                <option value="new-client">
+                  New Client
+                </option>
               </select>
             </label>
 
             <label>
               RETURN TYPE
+
               <select>
                 <option>1040 — Individual</option>
                 <option>1065 — Partnership</option>
@@ -102,33 +140,53 @@ function App() {
 
             <label>
               TAX YEAR
-              <select>
-                <option>2026</option>
-                <option>2025</option>
-                <option>2024</option>
+
+              <select
+                value={taxYear}
+                onChange={(event) =>
+                  setTaxYear(event.target.value)
+                }
+              >
+                {!standardYears.includes(taxYear) && (
+                  <option value={taxYear}>
+                    {taxYear}
+                  </option>
+                )}
+
+                <option value="2026">2026</option>
+                <option value="2025">2025</option>
+                <option value="2024">2024</option>
               </select>
             </label>
 
-            <span className="status-chip">Illustrative data</span>
+            <span className="status-chip">
+              Illustrative data
+            </span>
           </section>
 
           <nav className="tabs">
             <button
-              className={activeTab === 'worksheet' ? 'active' : ''}
+              className={
+                activeTab === 'worksheet' ? 'active' : ''
+              }
               onClick={() => setActiveTab('worksheet')}
             >
               Risk Worksheet
             </button>
 
             <button
-              className={activeTab === 'comparison' ? 'active' : ''}
+              className={
+                activeTab === 'comparison' ? 'active' : ''
+              }
               onClick={() => setActiveTab('comparison')}
             >
               Comparison
             </button>
 
             <button
-              className={activeTab === 'ai' ? 'active' : ''}
+              className={
+                activeTab === 'ai' ? 'active' : ''
+              }
               onClick={() => setActiveTab('ai')}
             >
               AI Review
@@ -140,11 +198,16 @@ function App() {
               <div className="card">
                 <div className="card-heading">
                   <div>
-                    <span className="eyebrow">RETURN INFORMATION</span>
+                    <span className="eyebrow">
+                      RETURN INFORMATION
+                    </span>
+
                     <h2>Shared Client Inputs</h2>
                   </div>
 
-                  <span className="status-chip">Placeholder</span>
+                  <span className="status-chip">
+                    Placeholder
+                  </span>
                 </div>
 
                 <div className="form-grid">
@@ -165,6 +228,7 @@ function App() {
 
                   <label>
                     Prior Audit History
+
                     <select>
                       <option>None</option>
                       <option>Prior audit — no change</option>
@@ -179,6 +243,7 @@ function App() {
 
                   <label>
                     Amended Return?
+
                     <select>
                       <option>No</option>
                       <option>Yes</option>
@@ -190,7 +255,10 @@ function App() {
               <div className="card">
                 <div className="card-heading">
                   <div>
-                    <span className="eyebrow">1040 PDF IMPORT</span>
+                    <span className="eyebrow">
+                      1040 PDF IMPORT
+                    </span>
+
                     <h2>Imported Return Data</h2>
                   </div>
 
@@ -211,7 +279,9 @@ function App() {
 
                     <button
                       className="small-button"
-                      onClick={() => fileInputRef.current?.click()}
+                      onClick={() =>
+                        fileInputRef.current?.click()
+                      }
                     >
                       Import 1040 PDF
                     </button>
@@ -219,14 +289,16 @@ function App() {
                 </div>
 
                 <p className="section-description">
-                  Future versions will read an uploaded Form 1040 package and
-                  identify relevant Schedule C, Schedule E, and Schedule F
-                  information automatically.
+                  Future versions will read an uploaded Form 1040
+                  package and identify relevant Schedule C,
+                  Schedule E, and Schedule F information
+                  automatically.
                 </p>
 
                 {selectedFileName && (
                   <div className="phase-banner">
-                    <strong>Selected PDF:</strong> {selectedFileName}
+                    <strong>Selected PDF:</strong>{' '}
+                    {selectedFileName}
                   </div>
                 )}
 
@@ -239,7 +311,9 @@ function App() {
 
                   <div className="import-card">
                     <span>Schedule E</span>
-                    <strong>Rental / Pass-through Income</strong>
+                    <strong>
+                      Rental / Pass-through Income
+                    </strong>
                     <p>No extracted data yet</p>
                   </div>
 
@@ -253,7 +327,10 @@ function App() {
 
               <div className="section-header">
                 <div>
-                  <span className="eyebrow">RISK FACTORS</span>
+                  <span className="eyebrow">
+                    RISK FACTORS
+                  </span>
+
                   <h2>Scenario Worksheet</h2>
                 </div>
 
@@ -308,7 +385,9 @@ function App() {
                     </tr>
 
                     <tr>
-                      <td>Year-over-year revenue swing</td>
+                      <td>
+                        Year-over-year revenue swing
+                      </td>
                       <td>Placeholder</td>
                       <td>Placeholder</td>
                       <td>Placeholder</td>
@@ -339,7 +418,8 @@ function App() {
 
               <div className="notes-card">
                 <label>
-                  Notes & Assumptions
+                  Notes &amp; Assumptions
+
                   <textarea
                     rows={4}
                     placeholder="Add documentation notes, assumptions, or items to review..."
@@ -349,12 +429,15 @@ function App() {
 
               <div className="page-actions">
                 <span>
-                  Phase 1 UI only · No audit-risk calculations are running.
+                  Phase 1 UI only · No audit-risk calculations
+                  are running.
                 </span>
 
                 <button
                   className="primary-button"
-                  onClick={() => setActiveTab('comparison')}
+                  onClick={() =>
+                    setActiveTab('comparison')
+                  }
                 >
                   View Comparison →
                 </button>
@@ -366,7 +449,9 @@ function App() {
             <section className="tab-page">
               <div className="comparison-grid">
                 <div className="card risk-card">
-                  <span className="eyebrow">OVERALL RISK</span>
+                  <span className="eyebrow">
+                    OVERALL RISK
+                  </span>
 
                   <h2>Risk Score</h2>
 
@@ -417,7 +502,9 @@ function App() {
               </div>
 
               <div className="card">
-                <span className="eyebrow">RISK CONTRIBUTION</span>
+                <span className="eyebrow">
+                  RISK CONTRIBUTION
+                </span>
 
                 <h2>Risk Contribution by Factor</h2>
 
@@ -456,19 +543,22 @@ function App() {
                 </div>
 
                 <p className="sample-note">
-                  Visual placeholder only — bars do not represent real audit
-                  risk.
+                  Visual placeholder only — bars do not
+                  represent real audit risk.
                 </p>
               </div>
 
               <div className="card">
-                <span className="eyebrow">EXPLAINER</span>
+                <span className="eyebrow">
+                  EXPLAINER
+                </span>
 
                 <h2>What Drives This?</h2>
 
                 <p>
-                  Once the scoring engine is connected, this section will
-                  explain which return characteristics contribute most to the
+                  Once the scoring engine is connected, this
+                  section will explain which return
+                  characteristics contribute most to the
                   audit-risk assessment.
                 </p>
               </div>
@@ -478,19 +568,22 @@ function App() {
           {activeTab === 'ai' && (
             <section className="tab-page">
               <div className="ai-banner">
-                AI Review is a Phase 1 UI placeholder. No AI analysis is being
-                performed.
+                AI Review is a Phase 1 UI placeholder. No AI
+                analysis is being performed.
               </div>
 
               <div className="insight-grid">
                 <article className="insight-card">
-                  <span className="eyebrow">INCOME REVIEW</span>
+                  <span className="eyebrow">
+                    INCOME REVIEW
+                  </span>
 
                   <h3>Income reporting insight</h3>
 
                   <p>
-                    Future AI review will explain unusual income patterns and
-                    identify supporting documentation that may be useful.
+                    Future AI review will explain unusual
+                    income patterns and identify supporting
+                    documentation that may be useful.
                   </p>
 
                   <label>
@@ -500,13 +593,16 @@ function App() {
                 </article>
 
                 <article className="insight-card">
-                  <span className="eyebrow">DOCUMENTATION</span>
+                  <span className="eyebrow">
+                    DOCUMENTATION
+                  </span>
 
                   <h3>Documentation insight</h3>
 
                   <p>
-                    Future analysis will highlight documentation gaps and
-                    provide review notes for the CPA.
+                    Future analysis will highlight
+                    documentation gaps and provide review
+                    notes for the CPA.
                   </p>
 
                   <label>
@@ -516,13 +612,16 @@ function App() {
                 </article>
 
                 <article className="insight-card">
-                  <span className="eyebrow">INDUSTRY COMPARISON</span>
+                  <span className="eyebrow">
+                    INDUSTRY COMPARISON
+                  </span>
 
                   <h3>Benchmark insight</h3>
 
                   <p>
-                    Future versions may compare return information against
-                    configured industry benchmarks.
+                    Future versions may compare return
+                    information against configured industry
+                    benchmarks.
                   </p>
 
                   <label>
@@ -532,13 +631,16 @@ function App() {
                 </article>
 
                 <article className="insight-card">
-                  <span className="eyebrow">RETURN HISTORY</span>
+                  <span className="eyebrow">
+                    RETURN HISTORY
+                  </span>
 
                   <h3>Historical review</h3>
 
                   <p>
-                    Prior-year information and audit history may later be used
-                    as additional review context.
+                    Prior-year information and audit history
+                    may later be used as additional review
+                    context.
                   </p>
 
                   <label>
@@ -551,6 +653,7 @@ function App() {
               <div className="notes-card">
                 <label>
                   CPA Observations
+
                   <textarea
                     rows={5}
                     placeholder="Add professional observations or review notes..."
@@ -567,7 +670,10 @@ function App() {
           <div className="report-modal">
             <div className="modal-heading">
               <div>
-                <span className="eyebrow">REPORT</span>
+                <span className="eyebrow">
+                  REPORT
+                </span>
+
                 <h2>Prepare Report</h2>
               </div>
 
@@ -580,7 +686,8 @@ function App() {
             </div>
 
             <p>
-              Select the sections that will eventually appear in the report.
+              Select the sections that will eventually appear
+              in the report.
             </p>
 
             <div className="report-options">
@@ -596,7 +703,7 @@ function App() {
 
               <label>
                 <input type="checkbox" defaultChecked />
-                Risk score & chart
+                Risk score &amp; chart
               </label>
 
               <label>

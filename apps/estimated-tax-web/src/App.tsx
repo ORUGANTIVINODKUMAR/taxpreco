@@ -1,9 +1,19 @@
-
+import { useState } from 'react'
+import { getLaunchContext } from './launchContext'
 import './App.css'
 
-
 function App() {
+  const launchContext = getLaunchContext()
 
+  const [clientId, setClientId] = useState(
+    launchContext.clientId || 'sample-client',
+  )
+
+  const [taxYear, setTaxYear] = useState(
+    launchContext.taxYear || '2026',
+  )
+
+  const standardYears = ['2026', '2025']
 
   return (
     <div className="app-shell">
@@ -36,6 +46,7 @@ function App() {
           <span>
             Workspace / <strong>Estimated Tax Planner</strong>
           </span>
+
           <span>Phase 1 UI Preview</span>
         </header>
 
@@ -49,7 +60,8 @@ function App() {
               <h1>Quarterly Estimated Tax Worksheet</h1>
 
               <p>
-                Review federal and state planning inputs for the selected quarter.
+                Review federal and state planning inputs for the selected
+                quarter.
               </p>
             </div>
 
@@ -61,24 +73,40 @@ function App() {
           <section className="toolbar">
             <label>
               Client
-              <select defaultValue="">
-                <option value="" disabled>
-                  Select client
-                </option>
-                <option>Sample Client</option>
+
+              <select
+                value={clientId}
+                onChange={(event) => setClientId(event.target.value)}
+              >
+                {clientId !== 'sample-client' && (
+                  <option value={clientId}>
+                    Tapreco Client ({clientId})
+                  </option>
+                )}
+
+                <option value="sample-client">Sample Client</option>
               </select>
             </label>
 
             <label>
               Tax Year
-              <select defaultValue="2026">
-                <option>2026</option>
-                <option>2025</option>
+
+              <select
+                value={taxYear}
+                onChange={(event) => setTaxYear(event.target.value)}
+              >
+                {!standardYears.includes(taxYear) && (
+                  <option value={taxYear}>{taxYear}</option>
+                )}
+
+                <option value="2026">2026</option>
+                <option value="2025">2025</option>
               </select>
             </label>
 
             <label>
               Quarter
+
               <select defaultValue="Q2">
                 <option>Q1</option>
                 <option>Q2</option>
@@ -122,41 +150,23 @@ function App() {
 
                   <tr>
                     <td>Prior-year total tax</td>
-                    <td>
-                      <input placeholder="$0" />
-                    </td>
-                    <td>
-                      <input placeholder="$0" />
-                    </td>
-                    <td>
-                      <input placeholder="$0" />
-                    </td>
+                    <td><input placeholder="$0" /></td>
+                    <td><input placeholder="$0" /></td>
+                    <td><input placeholder="$0" /></td>
                   </tr>
 
                   <tr>
                     <td>Prior-year AGI</td>
-                    <td>
-                      <input placeholder="$0" />
-                    </td>
-                    <td>
-                      <input placeholder="$0" />
-                    </td>
-                    <td>
-                      <input placeholder="$0" />
-                    </td>
+                    <td><input placeholder="$0" /></td>
+                    <td><input placeholder="$0" /></td>
+                    <td><input placeholder="$0" /></td>
                   </tr>
 
                   <tr>
                     <td>Safe-harbor percentage</td>
-                    <td>
-                      <input placeholder="%" />
-                    </td>
-                    <td>
-                      <input placeholder="%" />
-                    </td>
-                    <td>
-                      <input placeholder="%" />
-                    </td>
+                    <td><input placeholder="%" /></td>
+                    <td><input placeholder="%" /></td>
+                    <td><input placeholder="%" /></td>
                   </tr>
 
                   <tr className="section-row">
@@ -165,15 +175,9 @@ function App() {
 
                   <tr>
                     <td>Projected current-year tax</td>
-                    <td>
-                      <input placeholder="$0" />
-                    </td>
-                    <td>
-                      <input placeholder="$0" />
-                    </td>
-                    <td>
-                      <input placeholder="$0" />
-                    </td>
+                    <td><input placeholder="$0" /></td>
+                    <td><input placeholder="$0" /></td>
+                    <td><input placeholder="$0" /></td>
                   </tr>
 
                   <tr className="section-row">
@@ -182,28 +186,16 @@ function App() {
 
                   <tr>
                     <td>W-2 withholding</td>
-                    <td>
-                      <input placeholder="$0" />
-                    </td>
-                    <td>
-                      <input placeholder="$0" />
-                    </td>
-                    <td>
-                      <input placeholder="$0" />
-                    </td>
+                    <td><input placeholder="$0" /></td>
+                    <td><input placeholder="$0" /></td>
+                    <td><input placeholder="$0" /></td>
                   </tr>
 
                   <tr>
                     <td>Prior estimated payments</td>
-                    <td>
-                      <input placeholder="$0" />
-                    </td>
-                    <td>
-                      <input placeholder="$0" />
-                    </td>
-                    <td>
-                      <input placeholder="$0" />
-                    </td>
+                    <td><input placeholder="$0" /></td>
+                    <td><input placeholder="$0" /></td>
+                    <td><input placeholder="$0" /></td>
                   </tr>
 
                   <tr className="total-row">
@@ -241,15 +233,13 @@ function App() {
             </div>
 
             <div className="panel highlight-panel">
-              <div className="eyebrow">
-                Payroll Adjustment
-              </div>
+              <div className="eyebrow">Payroll Adjustment</div>
 
               <h2>W-4 Withholding Recommendation</h2>
 
               <p>
-                This section is a Phase 1 placeholder. No withholding calculations
-                are connected yet.
+                This section is a Phase 1 placeholder. No withholding
+                calculations are connected yet.
               </p>
 
               <div className="form-grid">
@@ -260,22 +250,15 @@ function App() {
 
                 <label>
                   Adjustment Method
+
                   <select defaultValue="">
                     <option value="" disabled>
                       Select method
                     </option>
 
-                    <option>
-                      Extra withholding per paycheck
-                    </option>
-
-                    <option>
-                      Estimated tax payments
-                    </option>
-
-                    <option>
-                      Combination
-                    </option>
+                    <option>Extra withholding per paycheck</option>
+                    <option>Estimated tax payments</option>
+                    <option>Combination</option>
                   </select>
                 </label>
               </div>

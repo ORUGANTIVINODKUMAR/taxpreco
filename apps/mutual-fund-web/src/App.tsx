@@ -1,17 +1,25 @@
 import { useState } from 'react'
+import { getLaunchContext } from './launchContext'
 import './App.css'
-
 
 type TabName = 'municipal' | 'us' | 'lookup'
 
 function App() {
-  const [activeTab, setActiveTab] = useState<TabName>('municipal')
+  const launchContext = getLaunchContext()
 
+  const [activeTab, setActiveTab] =
+    useState<TabName>('municipal')
+
+  const taxYear = launchContext.taxYear || '2025'
 
   return (
-    <div className="app-container">
+    <div
+      className="app-container"
+      data-client-id={launchContext.clientId ?? undefined}
+      data-tax-year={taxYear}
+    >
       <header className="hero">
-        <h1>2025 Mutual Fund Tax Calculator</h1>
+        <h1>{taxYear} Mutual Fund Tax Calculator</h1>
 
         <p>
           Search across fund companies and calculate Tax-Exempt Interest,
@@ -38,21 +46,33 @@ function App() {
 
       <nav className="tabs">
         <button
-          className={activeTab === 'municipal' ? 'tab active' : 'tab'}
+          className={
+            activeTab === 'municipal'
+              ? 'tab active'
+              : 'tab'
+          }
           onClick={() => setActiveTab('municipal')}
         >
           Tax-Exempt Interest
         </button>
 
         <button
-          className={activeTab === 'us' ? 'tab active' : 'tab'}
+          className={
+            activeTab === 'us'
+              ? 'tab active'
+              : 'tab'
+          }
           onClick={() => setActiveTab('us')}
         >
           U.S. Obligations
         </button>
 
         <button
-          className={activeTab === 'lookup' ? 'tab active' : 'tab'}
+          className={
+            activeTab === 'lookup'
+              ? 'tab active'
+              : 'tab'
+          }
           onClick={() => setActiveTab('lookup')}
         >
           Fund Lookup
@@ -77,9 +97,18 @@ function App() {
                   <option value="">
                     — Not set (territory-exempt portion only) —
                   </option>
-                  <option value="California">California</option>
-                  <option value="New York">New York</option>
-                  <option value="Texas">Texas</option>
+
+                  <option value="California">
+                    California
+                  </option>
+
+                  <option value="New York">
+                    New York
+                  </option>
+
+                  <option value="Texas">
+                    Texas
+                  </option>
                 </select>
               </label>
             </div>
@@ -130,14 +159,20 @@ function App() {
         {activeTab === 'us' && (
           <section className="card">
             <h2>U.S. Government Obligations</h2>
-            <p>U.S. Obligations calculator will be added here.</p>
+
+            <p>
+              U.S. Obligations calculator will be added here.
+            </p>
           </section>
         )}
 
         {activeTab === 'lookup' && (
           <section className="card">
             <h2>Fund Lookup</h2>
-            <p>Fund lookup will be added here.</p>
+
+            <p>
+              Fund lookup will be added here.
+            </p>
           </section>
         )}
       </main>
