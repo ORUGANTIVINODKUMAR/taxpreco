@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import './App.css'
-
+import { apiRequest } from './api'
 type Tab = 'worksheet' | 'comparison' | 'ai'
 
 function App() {
@@ -9,6 +9,7 @@ function App() {
   const [selectedFileName, setSelectedFileName] = useState('')
 
   const fileInputRef = useRef<HTMLInputElement>(null)
+  
 
   return (
     <div className="audit-app">
