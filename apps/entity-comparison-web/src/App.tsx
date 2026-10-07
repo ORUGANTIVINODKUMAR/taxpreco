@@ -11,6 +11,7 @@ import { createDemoComparison, demoClients } from './data/sampleScenarios'
 import { navigation, sampleTools } from './data/tools'
 import type { AppPage, IntegrationStatus, ToolDefinition } from './types/tools'
 import type { EntityComparisonState } from './types/entityComparison'
+
 import './App.css'
 
 function initialPage(): AppPage {
@@ -28,7 +29,6 @@ function App() {
     connected: false, identity: null, catalogSource: 'sample',
   })
   const client = demoClients.find((item) => item.id === clientId) ?? demoClients[0]
-
   useEffect(() => {
     const controller = new AbortController()
     async function connect() {

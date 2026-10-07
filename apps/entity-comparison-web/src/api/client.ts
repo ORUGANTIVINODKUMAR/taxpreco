@@ -1,7 +1,9 @@
 import type { HealthResponse, IdentityResponse, ToolDefinition } from '../types/tools'
 
 // Empty base uses the Vite /api proxy locally or a same-origin production API.
-const baseUrl = (import.meta.env.VITE_API_BASE_URL ?? '').replace(/\/$/, '')
+const baseUrl = (
+  import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000'
+).replace(/\/$/, '')
 
 async function get<T>(path: string, signal?: AbortSignal, accessToken?: string): Promise<T> {
   const response = await fetch(`${baseUrl}/api/${path}`, {

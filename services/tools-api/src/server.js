@@ -15,7 +15,12 @@ app.get("/health", (req, res) => {
     service: "tools-api",
   });
 });
-
+app.get("/api/health", (req, res) => {
+  res.json({
+    status: "ok",
+    service: "taxpreco-tools",
+  });
+});
 const PORT = process.env.PORT || 4000;
 
 app.listen(PORT, () => {

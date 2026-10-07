@@ -11,4 +11,16 @@ router.get("/context", requireAuth, attachContext, (req, res) => {
   });
 });
 
+router.get("/me", requireAuth, attachContext, (req, res) => {
+  res.json({
+    authenticated: true,
+    mode: "jwt",
+    user: {
+      id: req.context.userId,
+      name: req.user?.name || req.context.email || "Tapreco User",
+      role: req.user?.role || "user",
+    },
+  });
+});
+
 module.exports = router;
