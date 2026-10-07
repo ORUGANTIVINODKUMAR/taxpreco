@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import './App.css'
 
+
 type TabName = 'municipal' | 'us' | 'lookup'
 
 function App() {
   const [activeTab, setActiveTab] = useState<TabName>('municipal')
+
 
   return (
     <div className="app-container">
@@ -69,7 +71,7 @@ function App() {
 
             <div className="toolbar">
               <label className="resident-state">
-                <span>Client's resident state</span>
+                <span>Client&apos;s resident state</span>
 
                 <select>
                   <option value="">
@@ -105,9 +107,7 @@ function App() {
               />
 
               <div className="muni-value">0.00%</div>
-
               <div className="muni-value">$0.00</div>
-
               <div className="muni-value">$0.00</div>
             </div>
 
