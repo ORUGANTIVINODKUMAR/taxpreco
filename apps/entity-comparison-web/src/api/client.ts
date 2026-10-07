@@ -2,7 +2,7 @@ import type { HealthResponse, IdentityResponse, ToolDefinition } from '../types/
 
 // Empty base uses the Vite /api proxy locally or a same-origin production API.
 const baseUrl = (
-  import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:4000'
+  import.meta.env.VITE_TOOLS_API_URL ?? 'http://localhost:4000'
 ).replace(/\/$/, '')
 
 async function get<T>(path: string, signal?: AbortSignal, accessToken?: string): Promise<T> {
