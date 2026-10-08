@@ -1,23 +1,13 @@
 import type { HealthResponse, IdentityResponse, ToolDefinition } from '../types/tools'
+import { apiRequest, getMe as getLocalUser } from '../api'
 
-// Empty base uses the Vite /api proxy locally or a same-origin production API.
-const baseUrl = (
-  import.meta.env.VITE_TOOLS_API_URL ?? 'http://localhost:4000'
-).replace(/\/$/, '')
-
-async function get<T>(path: string, signal?: AbortSignal, accessToken?: string): Promise<T> {
-  const response = await fetch(`${baseUrl}/api/${path}`, {
-    signal,
-    headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined,
-  })
-  if (!response.ok) throw new Error(`Integration API returned ${response.status}`)
+const baseUrl = (import.meta.env.VITE_TOOLS_API_URL || 'http://localhost:4000').replace(/\/$/, '')
+async function publicGet<T>(path: string, signal?: AbortSignal): Promise<T> {
+  const response = await fetch(baseUrl + '/api/' + path, { signal })
+  if (!response.ok) throw new Error('The tools API is unavailable.')
   return response.json() as Promise<T>
 }
-
-export const getHealth = (signal?: AbortSignal) => get<HealthResponse>('health', signal)
-export const getTools = (signal?: AbortSignal) => get<ToolDefinition[]>('tools', signal)
-
-// Alpha's host can pass an access token here once server verification is implemented.
-// Tokens are never persisted, decoded as trusted claims, or issued by this frontend.
-export const getMe = (accessToken?: string, signal?: AbortSignal) =>
-  get<IdentityResponse>('me', signal, accessToken)
+export const getHealth = (signal?: AbortSignal) => publicGet<HealthResponse>('health', signal)
+export const getTools = (signal?: AbortSignal) => publicGet<ToolDefinition[]>('tools', signal)
+export const getMe = async (signal?: AbortSignal): Promise<IdentityResponse> => ({ authenticated: true, mode: 'firebase', user: await getLocalUser(signal) })
+export const getEntityStatus = (signal?: AbortSignal) => apiRequest('/api/tools/entity-comparison/status', { signal })

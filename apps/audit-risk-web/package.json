@@ -7,9 +7,12 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:handoff": "node --test tests/portalHandoff.test.mjs",
+    "test:session": "node --test tests/session.test.mjs"
   },
   "dependencies": {
+    "firebase": "^13.0.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
   },

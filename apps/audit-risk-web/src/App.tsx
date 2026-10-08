@@ -1,10 +1,11 @@
+import PortalBreadcrumbs from './PortalBreadcrumbs'
 import { useRef, useState } from 'react'
 import './App.css'
 import { getLaunchContext } from './launchContext'
 
 type Tab = 'worksheet' | 'comparison' | 'ai'
 
-function App() {
+function App({ pending = false }: { pending?: boolean }) {
   const launchContext = getLaunchContext()
 
   const initialTaxYear = launchContext.taxYear || '2026'
@@ -22,7 +23,7 @@ function App() {
   const standardYears = ['2026', '2025', '2024']
 
   return (
-    <div className="audit-app">
+    <div aria-busy={pending} className="audit-app">
       <aside className="sidebar">
         <div className="brand">
           <span className="brand-mark">t</span>
@@ -55,9 +56,7 @@ function App() {
 
       <div className="app-content">
         <header className="topbar">
-          <span>
-            Workspace / <strong>Audit Risk Analyzer</strong>
-          </span>
+          <PortalBreadcrumbs />
 
           <span>Federal only · Phase 1</span>
         </header>

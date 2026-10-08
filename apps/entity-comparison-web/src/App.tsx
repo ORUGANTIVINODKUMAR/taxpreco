@@ -26,7 +26,7 @@ function initialPage(): AppPage {
   )
 }
 
-function App() {
+function App({ pending = false }: { pending?: boolean }) {
   const launchContext = getLaunchContext()
 
   const initialClientId =
@@ -56,13 +56,14 @@ function App() {
     demoClients.find((item) => item.id === clientId) ?? demoClients[0]
 
   useEffect(() => {
+    if (pending) return
     const controller = new AbortController()
 
     async function connect() {
       const [health, catalog, identity] = await Promise.allSettled([
         getHealth(controller.signal),
         getTools(controller.signal),
-        getMe(undefined, controller.signal),
+        getMe(controller.signal),
       ])
 
       if (controller.signal.aborted) return
@@ -82,7 +83,7 @@ function App() {
     void connect()
 
     return () => controller.abort()
-  }, [])
+  }, [pending])
 
   useEffect(() => {
     const changed = () => {

@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test'
 import type { Page } from '@playwright/test'
+import { installPortalFixture, portalLaunch } from './portalFixture'
 
 const browserErrors = new WeakMap<Page, string[]>()
 const openEntity = (page: Page) => page.getByRole('button', { name: 'Open Entity Comparison', exact: false }).click()
@@ -8,20 +9,18 @@ test.beforeEach(async ({ page }) => {
   const errors: string[] = []
   browserErrors.set(page, errors)
   page.on('pageerror', (error) => errors.push(error.message))
-  await page.goto('/')
+  await installPortalFixture(page)
+  await page.goto(portalLaunch('http://127.0.0.1:5199', '/#dashboard'))
+  await expect(page.locator('[inert]')).toHaveCount(0)
   await expect(page.getByRole('heading', { name: 'Advisory dashboard', exact: true })).toBeVisible()
 })
 test.afterEach(async ({ page }) => { expect(browserErrors.get(page)).toEqual([]) })
 
-test('dashboard uses the live API and offers only Entity Comparison', async ({ page, request }) => {
+test('authenticated dashboard uses the shared API and offers only Entity Comparison', async ({ page }) => {
   await expect(page.locator('.topbar')).toContainText('API connected')
   await expect(page.getByText('Connected tool catalog', { exact: true })).toBeVisible()
-  await expect(page.locator('.topbar')).toContainText('Development mock')
-  const health = await request.get('http://127.0.0.1:3002/api/health')
-  expect(await health.json()).toEqual({ status: 'ok', service: 'taxpreco-tools' })
-  expect((await (await request.get('http://127.0.0.1:3002/api/tools')).json()).map((tool: { id: string }) => tool.id)).toEqual(['entity-comparison'])
-  const me = await request.get('http://127.0.0.1:3002/api/me')
-  expect((await me.json()).mode).toBe('mock')
+  await expect(page.locator('.topbar')).toContainText('Tapreco workspace')
+  await expect(page.getByText('Your Tapreco account is verified.', { exact: false })).toBeVisible()
   await expect(page.locator('.tool-card')).toHaveCount(1)
   await expect(page.getByRole('navigation', { name: 'Workspace', exact: true }).getByRole('link')).toHaveCount(2)
   await openEntity(page)
@@ -91,8 +90,8 @@ test('tabs, rule-based review, report selection and accessible modal behavior wo
   await expect(page.getByRole('button', { name: 'Export report', exact: false })).toBeFocused()
 })
 
-test('sample dashboard and tool remain usable when the API is unavailable', async ({ page }) => {
-  await page.route('http://127.0.0.1:3002/api/**', (route) => route.fulfill({ status: 503, contentType: 'application/json', body: '{"error":"unavailable"}', headers: { 'Access-Control-Allow-Origin': 'http://127.0.0.1:5199' } }))
+test('sample catalog remains usable when public catalog is unavailable after account verification', async ({ page }) => {
+  await page.route('http://127.0.0.1:4099/api/{health,tools}', (route) => route.fulfill({ status: 503, contentType: 'application/json', body: '{"error":"unavailable"}', headers: { 'Access-Control-Allow-Origin': 'http://127.0.0.1:5199' } }))
   await page.reload()
   await expect(page.getByText('Sample tool catalog', { exact: true })).toBeVisible()
   await expect(page.locator('.topbar')).toContainText('API offline')

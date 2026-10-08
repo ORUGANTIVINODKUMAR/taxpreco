@@ -1,3 +1,4 @@
+import PortalBreadcrumbs from '../../PortalBreadcrumbs'
 import { navigation } from '../../data/tools'
 import type { AppPage, IntegrationStatus } from '../../types/tools'
 export function Topbar({
@@ -11,11 +12,8 @@ export function Topbar({
 }) {
   return (
     <header className="topbar">
-      <span>
-        Workspace /{' '}
-        <strong>{navigation.find((item) => item.id === page)?.label}</strong>
-      </span>
-      <span>{integration.identity?.mode === 'mock' ? 'Demo Advisor · Development mock' : 'Sample workspace'} · {integration.connected ? 'API connected' : 'API offline'}</span>
+      <PortalBreadcrumbs />
+      <span>Tapreco workspace · {integration.connected ? 'API connected' : 'API offline'}</span>
       <div className="mobile-navigation">
         <label className="sr-only" htmlFor="workspace-navigation">
           Workspace navigation

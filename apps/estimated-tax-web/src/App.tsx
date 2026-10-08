@@ -1,8 +1,9 @@
+import PortalBreadcrumbs from './PortalBreadcrumbs'
 import { useState } from 'react'
 import { getLaunchContext } from './launchContext'
 import './App.css'
 
-function App() {
+function App({ pending = false }: { pending?: boolean }) {
   const launchContext = getLaunchContext()
 
   const [clientId, setClientId] = useState(
@@ -16,7 +17,7 @@ function App() {
   const standardYears = ['2026', '2025']
 
   return (
-    <div className="app-shell">
+    <div aria-busy={pending} className="app-shell">
       <aside className="sidebar">
         <div>
           <div className="brand">
@@ -43,9 +44,7 @@ function App() {
 
       <div className="workspace">
         <header className="topbar">
-          <span>
-            Workspace / <strong>Estimated Tax Planner</strong>
-          </span>
+          <PortalBreadcrumbs />
 
           <span>Phase 1 UI Preview</span>
         </header>

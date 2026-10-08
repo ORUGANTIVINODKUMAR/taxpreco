@@ -27,9 +27,7 @@ export function Dashboard({ tools, integration, onNavigate }: {
       </div>
       <p className="note" role="status">
         {integration.connected ? 'API connected.' : 'API unavailable. The sample workspace remains available.'}{' '}
-        {integration.identity?.mode === 'mock'
-          ? 'Development mock session: Demo Advisor. This is not Tapreco authentication.'
-          : 'Sign-in is managed by Tapreco; Alpha token verification is pending.'}
+        {integration.identity ? 'Your Tapreco account is verified.' : 'Checking your Tapreco account.'}
       </p>
     </>
   )

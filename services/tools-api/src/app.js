@@ -7,7 +7,7 @@ const { createRequireAuth } = require('./middleware/auth')
 const { createAttachContext } = require('./middleware/context')
 
 function allowedOrigins(value = process.env.CORS_ORIGINS) {
-  const values = (value || 'http://localhost:5175,http://192.168.0.175:5175').split(',').map(origin => origin.trim())
+  const values = (value || "http://localhost:5173,http://192.168.0.175:5173,http://localhost:5175,http://192.168.0.175:5175,http://localhost:5176,http://192.168.0.175:5176,http://localhost:5177,http://192.168.0.175:5177").split(',').map(origin => origin.trim())
   for (const origin of values) {
     const parsed = new URL(origin)
     if (!['http:', 'https:'].includes(parsed.protocol) || parsed.origin !== origin) throw new Error('Invalid CORS origin configuration.')

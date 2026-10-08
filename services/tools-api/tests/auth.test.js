@@ -7,6 +7,26 @@ const { getAuth } = require('firebase-admin/auth')
 const { createApp, allowedOrigins } = require('../src/app')
 const { pool } = require('../src/db')
 
+test('Phase 7 local origins allow all four apps while unknown origins remain blocked', async () => {
+  // Exercise defaults explicitly; a developer's .env must not change this assertion.
+  const origins = allowedOrigins('')
+  await requestApp({ origins }, async base => {
+    for (const host of ['localhost', '192.168.0.175']) {
+      for (const port of [5173, 5175, 5176, 5177]) {
+        const origin = `http://${host}:${port}`
+        const response = await fetch(base + '/api/me', {
+          method: 'OPTIONS',
+          headers: { Origin: origin, 'Access-Control-Request-Method': 'GET', 'Access-Control-Request-Headers': 'authorization' },
+        })
+        assert.equal(response.status, 204)
+        assert.equal(response.headers.get('access-control-allow-origin'), origin)
+      }
+    }
+    const response = await fetch(base + '/api/me', { method: 'OPTIONS', headers: { Origin: 'http://unlisted.example' } })
+    assert.equal(response.headers.get('access-control-allow-origin'), null)
+  })
+})
+
 const keys = generateKeyPairSync('rsa', { modulusLength: 2048 })
 const app = initializeApp({ projectId: 'maigha-taxpro' }, 'phase4-verification-test')
 const auth = getAuth(app)

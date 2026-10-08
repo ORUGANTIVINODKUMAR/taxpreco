@@ -15,8 +15,8 @@ export interface HealthResponse {
 
 export interface IdentityResponse {
   authenticated: true
-  mode: 'mock' | 'jwt'
-  user: { id: string; name: string; role: string }
+  mode: 'firebase'
+  user: { id: string; firebaseUid: string; email: string | null; name: string }
 }
 
 export interface IntegrationStatus {
