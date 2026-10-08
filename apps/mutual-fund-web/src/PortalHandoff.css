@@ -1,0 +1,7 @@
+.portal-handoff { min-height: 100vh; display: grid; place-items: center; padding: 24px; }
+.portal-handoff-card { width: 100%; max-width: 560px; }
+.portal-handoff-brand { font-size: 13px; font-weight: 700; }
+.portal-handoff-card h1 { margin: 0 0 16px; font-family: Georgia, serif; font-size: 28px; }
+.portal-handoff-card p { line-height: 1.6; overflow-wrap: anywhere; }
+.portal-handoff-link { display: inline-block; margin-top: 12px; color: var(--green); font-weight: 700; text-underline-offset: 4px; }
+.portal-handoff-link:focus-visible { outline: 3px solid var(--green); outline-offset: 5px; }

@@ -4,7 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node src/server.js"
+    "start": "node src/server.js",
+    "db:migrate": "node scripts/migrate.js",
+    "users:seed": "node scripts/seed-users.js",
+    "test:provisioning": "node --test tests/provisioning.test.js",
+    "test:provisioning:db": "node --test tests/provisioning-db.test.js",
+    "test:auth": "node --test tests/auth.test.js",
+    "test:ownership": "node --test tests/ownership.test.js"
   },
   "keywords": [],
   "author": "",
@@ -14,6 +20,7 @@
     "cors": "^2.8.6",
     "dotenv": "^18.0.5",
     "express": "^5.2.1",
+    "firebase-admin": "^14.5.0",
     "jsonwebtoken": "^9.0.3",
     "pg": "^8.23.1"
   }

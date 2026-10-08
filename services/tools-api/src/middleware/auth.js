@@ -1,28 +1,20 @@
-const jwt = require("jsonwebtoken");
+const { verifyIdToken } = require('../firebase')
 
-function requireAuth(req, res, next) {
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({
-      error: "Missing or invalid authorization header",
-    });
-  }
-
-  const token = authHeader.split(" ")[1];
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    req.user = decoded;
-    next();
-  } catch (error) {
-    return res.status(401).json({
-      error: "Invalid or expired token",
-    });
+function createRequireAuth(verify = verifyIdToken) {
+  return async function requireAuth(req, res, next) {
+    const header = req.headers.authorization
+    const match = typeof header === 'string' && /^Bearer ([^\s]+)$/.exec(header)
+    if (!match) return res.status(401).json({ code: 'unauthenticated', error: 'A Firebase ID token is required.' })
+    try {
+      const identity = await verify(match[1])
+      if (!identity || typeof identity.uid !== 'string' || !identity.uid) return res.status(401).json({ code: 'unauthenticated', error: 'Invalid Firebase identity.' })
+      req.user = identity
+      next()
+    } catch (error) {
+      const invalid = new Set(['auth/argument-error', 'auth/invalid-argument', 'auth/invalid-id-token', 'auth/id-token-expired', 'auth/id-token-revoked', 'auth/user-disabled'])
+      const status = invalid.has(error.code) ? 401 : 503
+      res.status(status).json({ code: status === 401 ? 'unauthenticated' : 'auth_unavailable', error: status === 401 ? 'Invalid or expired Firebase ID token.' : 'Authentication verification is temporarily unavailable.' })
+    }
   }
 }
-
-module.exports = {
-  requireAuth,
-};
+module.exports = { createRequireAuth, requireAuth: createRequireAuth() }

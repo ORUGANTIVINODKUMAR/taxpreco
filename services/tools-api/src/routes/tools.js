@@ -2,6 +2,7 @@ const express = require("express");
 const { requireAuth } = require("../middleware/auth");
 const { attachContext } = require("../middleware/context");
 
+function createToolsRouter(auth = requireAuth, context = attachContext) {
 const router = express.Router();
 
 const allowedTools = new Set([
@@ -42,8 +43,8 @@ router.get("/", (req, res) => {
     },
   ]);
 });
-router.use(requireAuth);
-router.use(attachContext);
+router.use(auth);
+router.use(context);
 
 router.get("/:toolName/status", (req, res) => {
   const { toolName } = req.params;
@@ -61,4 +62,6 @@ router.get("/:toolName/status", (req, res) => {
   });
 });
 
-module.exports = router;
+return router;
+}
+module.exports = { createToolsRouter };

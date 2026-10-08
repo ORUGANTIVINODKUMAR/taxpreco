@@ -1,40 +1,26 @@
-const express = require("express");
-const { initializeDatabase } = require("./db/init");
-const cors = require("cors");
-const mutualFundRoutes = require("./routes/mutualFund");
 require("dotenv").config();
-const contextRoutes = require("./routes/context");
-const toolsRoutes = require("./routes/tools");
-const app = express();
+const { createApp } = require("./app");
+const { firebaseAuth } = require("./firebase");
+const { initializeDatabase } = require("./db/init");
 const { testConnection } = require("./db");
-app.use(cors());
-app.use(express.json());
-app.use("/api", contextRoutes);
-app.use("/api/tools", toolsRoutes);
-app.use("/api/mutual-fund", mutualFundRoutes);
-app.get("/health", (req, res) => {
-  res.json({
-    status: "ok",
-    service: "tools-api",
-  });
-});
-app.get("/api/health", (req, res) => {
-  res.json({
-    status: "ok",
-    service: "taxpreco-tools",
-  });
-});
+try {
+firebaseAuth();
+const app = createApp();
 initializeDatabase()
   .then(() => {
     console.log("Database initialization complete");
   })
   .catch((error) => {
-    console.error("Database initialization failed:", error);
+    console.error("Database initialization failed.");
   });
 const PORT = process.env.PORT || 4000;
 testConnection().catch((error) => {
-  console.error("PostgreSQL connection failed:", error);
+  console.error("PostgreSQL connection failed.");
 });
 app.listen(PORT, () => {
   console.log(`Tools API running on port ${PORT}`);
 });
+} catch {
+  console.error("Tools API startup failed. Check Firebase project, credential format and CORS configuration.");
+  process.exitCode = 1;
+}

@@ -1,80 +1,72 @@
 import { useState } from 'react'
-import { getLaunchContext } from './launchContext'
+import { contextError, getLaunchContext } from './launchContext'
 import {
   getMutualFundSessions,
   saveMutualFundSession,
 } from './api'
+import type { SavedSession } from './api'
+import { portalLoginUrl } from './portalHandoff'
 import './App.css'
 
 type TabName = 'municipal' | 'us' | 'lookup'
 
-function App() {
-  const launchContext = getLaunchContext()
-
-  const [activeTab, setActiveTab] =
-    useState<TabName>('municipal')
-
+function App({ pending = false }: { pending?: boolean }) {
+  const initial = getLaunchContext()
+  const portalLogin = portalLoginUrl(import.meta.env.VITE_PORTAL_URL)
+  const portalOrigin = portalLogin ? new URL(portalLogin).origin : null
+  const [activeTab, setActiveTab] = useState<TabName>('municipal')
   const [residentState, setResidentState] = useState('')
   const [fundName, setFundName] = useState('')
   const [amount, setAmount] = useState('')
-  const [accessToken, setAccessToken] = useState('')
-
-  const clientId =
-    launchContext.clientId || 'client-123'
-
-  const taxYear =
-    launchContext.taxYear || '2026'
-
-  async function handleSave() {
-    if (!accessToken) {
-      alert('Add a JWT token first for local testing.')
-      return
-    }
-
-    try {
-      const amountValue = Number(amount || 0)
-
-      const saved = await saveMutualFundSession(
-        {
-          clientId,
-          taxYear,
-          residentState,
-          fundName,
-          amount: amountValue,
-          percentage: 0,
-          stateExempt: 0,
-          stateTaxable: amountValue,
-        },
-        accessToken,
-      )
-
-      console.log('Saved Mutual Fund session:', saved)
-
-      alert('Mutual Fund session saved.')
-    } catch (error) {
-      console.error('Save failed:', error)
-      alert('Save failed.')
-    }
+  const [percentage, setPercentage] = useState(0)
+  const [stateExempt, setStateExempt] = useState(0)
+  const [stateTaxable, setStateTaxable] = useState(0)
+  const clientId = initial.clientId || ''
+  const taxYear = initial.taxYear || ''
+  const [savedSessions, setSavedSessions] = useState<SavedSession[]>([])
+  const [selectedId, setSelectedId] = useState('')
+  const [message, setMessage] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [dirty, setDirty] = useState(false)
+  const validation = contextError(clientId, taxYear)
+  function persistContext() {
+    if (!validation) window.history.replaceState(null, '', window.location.pathname + '?' + new URLSearchParams({ clientId, taxYear }))
   }
-
-  async function handleLoad() {
-    if (!accessToken) {
-      alert('Add a JWT token first for local testing.')
-      return
-    }
-
+  async function handleSave() {
+    if (pending || validation || busy) return
+    setBusy(true); setMessage('')
     try {
-      const sessions = await getMutualFundSessions(
-        clientId,
-        taxYear,
-        accessToken,
-      )
-
-      console.log('Loaded Mutual Fund sessions:', sessions)
-    } catch (error) {
-      console.error('Load failed:', error)
-      alert('Load failed.')
-    }
+      const saved = await saveMutualFundSession({
+        clientId, taxYear, residentState, fundName, amount: Number(amount),
+        percentage, stateExempt, stateTaxable: dirty ? Number(amount) - stateExempt : stateTaxable,
+      })
+      setSavedSessions(value => [saved, ...value.filter(row => row.id !== saved.id)])
+      setSelectedId(saved.id); setDirty(false)
+      setStateTaxable(Number(saved.state_taxable))
+      setMessage('Session saved. Each save creates a new record.')
+      persistContext()
+    } catch (error) { setMessage(error instanceof Error ? error.message : 'Save failed. Please retry.') }
+    finally { setBusy(false) }
+  }
+  async function handleLoad() {
+    if (pending || validation || busy) return
+    setBusy(true); setMessage('')
+    try {
+      const rows = await getMutualFundSessions(clientId, taxYear)
+      setSavedSessions(rows); setSelectedId('')
+      setMessage(rows.length ? 'Choose a saved session, then click Restore selected session.' : 'No saved sessions for your account and this client/year.')
+      persistContext()
+    } catch (error) { setMessage(error instanceof Error ? error.message : 'Load failed. Please retry.') }
+    finally { setBusy(false) }
+  }
+  function restoreSelected() {
+    const selected = savedSessions.find(row => row.id === selectedId)
+    if (!selected) return
+    if (dirty && !window.confirm('Replace your unsaved inputs with this saved session?')) return
+    setResidentState(selected.resident_state || '')
+    setFundName(selected.fund_name); setAmount(String(selected.amount))
+    setPercentage(Number(selected.percentage)); setStateExempt(Number(selected.state_exempt)); setStateTaxable(Number(selected.state_taxable))
+    setDirty(false); setMessage('Selected session restored.')
   }
 
   return (
@@ -83,6 +75,14 @@ function App() {
       data-client-id={clientId}
       data-tax-year={taxYear}
     >
+      <nav className="workspace-breadcrumbs" aria-label="Breadcrumb">
+        {portalOrigin ? <a href={`${portalOrigin}/`}>Home</a> : <span>Home</span>}
+        <span aria-hidden="true"> / </span>
+        {portalOrigin ? <a href={`${portalOrigin}/choose`}>Tools</a> : <span>Tools</span>}
+        <span aria-hidden="true"> / </span>
+        <span aria-current="page">Mutual Fund</span>
+      </nav>
+      {pending && <p className="mini workspace-loading" role="status">Loading Mutual Fund…</p>}
       <header className="hero">
         <h1>{taxYear} Mutual Fund Tax Calculator</h1>
 
@@ -109,6 +109,7 @@ function App() {
         </div>
       </header>
 
+      <fieldset disabled={pending} className="workspace-controls" aria-busy={pending}>
       <nav className="tabs">
         <button
           className={
@@ -159,9 +160,10 @@ function App() {
                 <span>Client&apos;s resident state</span>
 
                 <select
+                  disabled={busy}
                   value={residentState}
                   onChange={(event) =>
-                    setResidentState(event.target.value)
+                    { setResidentState(event.target.value); setDirty(true) }
                   }
                 >
                   <option value="">
@@ -179,6 +181,7 @@ function App() {
                   <option value="Texas">
                     Texas
                   </option>
+                  {residentState && !['California', 'New York', 'Texas'].includes(residentState) && <option value={residentState}>{residentState}</option>}
                 </select>
               </label>
             </div>
@@ -197,32 +200,34 @@ function App() {
 
               <input
                 type="text"
+                disabled={busy}
                 placeholder="Search fund"
                 value={fundName}
                 onChange={(event) =>
-                  setFundName(event.target.value)
+                  { setFundName(event.target.value); setDirty(true) }
                 }
               />
 
               <input
                 type="number"
+                disabled={busy}
                 placeholder="0.00"
                 value={amount}
                 onChange={(event) =>
-                  setAmount(event.target.value)
+                  { setAmount(event.target.value); setDirty(true) }
                 }
               />
 
               <div className="muni-value">
-                0.00%
+                {percentage.toFixed(2)}%
               </div>
 
               <div className="muni-value">
-                $0.00
+                ${stateExempt.toFixed(2)}
               </div>
 
               <div className="muni-value">
-                $0.00
+                ${(dirty ? Number(amount || 0) - stateExempt : stateTaxable).toFixed(2)}
               </div>
             </div>
 
@@ -240,24 +245,6 @@ function App() {
               </div>
             </div>
 
-            <div style={{ marginTop: '24px' }}>
-              <label>
-                Local JWT token
-                <textarea
-                  rows={4}
-                  value={accessToken}
-                  onChange={(event) =>
-                    setAccessToken(event.target.value)
-                  }
-                  placeholder="Paste local JWT token here for testing only"
-                  style={{
-                    width: '100%',
-                    marginTop: '8px',
-                  }}
-                />
-              </label>
-            </div>
-
             <div
               style={{
                 display: 'flex',
@@ -268,6 +255,7 @@ function App() {
               <button
                 className="primary-button"
                 onClick={handleSave}
+                disabled={!!validation || busy || !fundName.trim() || !amount.trim()}
               >
                 Save to Database
               </button>
@@ -275,10 +263,21 @@ function App() {
               <button
                 className="secondary-button"
                 onClick={handleLoad}
+                disabled={!!validation || busy}
               >
                 Load from Database
               </button>
             </div>
+            <p className="mini" role="status">{busy ? 'Working…' : message}</p>
+            {savedSessions.length > 0 && <div className="mini">
+              <label>Saved sessions
+                <select aria-label="Saved sessions" value={selectedId} onChange={event => setSelectedId(event.target.value)} disabled={busy}>
+                  <option value="">Choose a session</option>
+                  {savedSessions.map(row => <option key={row.id} value={row.id}>{row.fund_name} · {row.amount} · {new Date(row.created_at).toLocaleString()}</option>)}
+                </select>
+              </label>
+              <button className="secondary-button" disabled={!selectedId || busy} onClick={restoreSelected}>Restore selected session</button>
+            </div>}
           </section>
         )}
 
@@ -302,6 +301,7 @@ function App() {
           </section>
         )}
       </main>
+      </fieldset>
     </div>
   )
 }

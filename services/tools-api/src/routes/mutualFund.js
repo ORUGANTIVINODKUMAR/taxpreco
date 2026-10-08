@@ -2,45 +2,45 @@ const express = require('express')
 const { pool } = require('../db')
 const { requireAuth } = require('../middleware/auth')
 const { attachContext } = require('../middleware/context')
+const { context: validateContext, submission } = require('../mutualFundValidation')
+const fields = 'id, client_id, tax_year, resident_state, fund_name, amount, percentage, state_exempt, state_taxable, created_at'
 
+function createMutualFundRouter(auth = requireAuth, context = attachContext, database = pool) {
 const router = express.Router()
 
-router.use(requireAuth)
-router.use(attachContext)
+router.use(auth)
+router.use(context)
 
 router.get('/sessions', async (req, res) => {
+  let input
+  try { input = validateContext(req.query.clientId, req.query.taxYear) }
+  catch (error) { return res.status(400).json({ code: 'invalid_context', error: error.message }) }
   try {
-    const clientId = req.query.clientId
-    const taxYear = req.query.taxYear
-
-    if (!clientId || !taxYear) {
-      return res.status(400).json({
-        error: 'clientId and taxYear are required',
-      })
-    }
-
-    const result = await pool.query(
+    const result = await database.query(
       `
-        SELECT *
-        FROM mutual_fund_sessions
-        WHERE client_id = $1
-          AND tax_year = $2
-        ORDER BY created_at DESC
+        SELECT ${fields}
+        FROM public.mutual_fund_sessions
+        WHERE owner_user_id = $1
+          AND client_id = $2
+          AND tax_year = $3
+        ORDER BY created_at DESC, id DESC
       `,
-      [clientId, taxYear],
+      [req.context.userId, input.clientId, input.taxYear],
     )
 
     res.json(result.rows)
   } catch (error) {
-    console.error('Failed to load Mutual Fund sessions:', error)
-
-    res.status(500).json({
+    res.status(503).json({
+      code: 'database_unavailable',
       error: 'Failed to load Mutual Fund sessions',
     })
   }
 })
 
 router.post('/sessions', async (req, res) => {
+  let input
+  try { input = submission(req.body) }
+  catch (error) { return res.status(400).json({ code: 'invalid_submission', error: error.message }) }
   try {
     const {
       clientId,
@@ -51,18 +51,12 @@ router.post('/sessions', async (req, res) => {
       percentage,
       stateExempt,
       stateTaxable,
-    } = req.body
+    } = input
 
-    if (!clientId || !taxYear) {
-      return res.status(400).json({
-        error: 'clientId and taxYear are required',
-      })
-    }
-
-    const result = await pool.query(
+    const result = await database.query(
       `
-        INSERT INTO mutual_fund_sessions (
-          user_id,
+        INSERT INTO public.mutual_fund_sessions (
+          owner_user_id,
           client_id,
           tax_year,
           resident_state,
@@ -73,7 +67,7 @@ router.post('/sessions', async (req, res) => {
           state_taxable
         )
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-        RETURNING *
+        RETURNING ${fields}
       `,
       [
         req.context.userId,
@@ -90,12 +84,13 @@ router.post('/sessions', async (req, res) => {
 
     res.status(201).json(result.rows[0])
   } catch (error) {
-    console.error('Failed to save Mutual Fund session:', error)
-
-    res.status(500).json({
+    res.status(503).json({
+      code: 'database_unavailable',
       error: 'Failed to save Mutual Fund session',
     })
   }
 })
 
-module.exports = router
+return router
+}
+module.exports = { createMutualFundRouter }

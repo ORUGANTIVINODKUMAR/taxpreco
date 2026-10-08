@@ -17,6 +17,10 @@ test-results/
 playwright-report/
 *.local
 
+# Local provisioning records and database review snapshots
+docs/maigha-users-for-upsilon.csv
+services/tools-api/private/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
