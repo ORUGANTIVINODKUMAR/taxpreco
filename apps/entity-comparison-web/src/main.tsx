@@ -4,9 +4,15 @@ import './index.css'
 import SessionGate from './SessionGate'
 import { receivePortalHandoff } from './portalHandoff'
 import { session } from './firebaseAuth'
+import { devAutoLoginEnabled } from './devLogin'
+
+// Direct development entry needs no portal token; leave the receive route for home.
+if (devAutoLoginEnabled && window.location.pathname === '/auth/portal' && !window.location.hash) {
+  window.history.replaceState(null, '', '/' + window.location.search + '#entity-comparison')
+}
 
 // Capture and clear the fragment exactly once, outside React's effect lifecycle.
-const handoff = window.location.pathname === '/auth/portal'
+const handoff = window.location.pathname === '/auth/portal' && (!devAutoLoginEnabled || window.location.hash !== '')
   ? receivePortalHandoff(
       { location: window.location, history: window.history, fetch: window.fetch.bind(window) },
       {

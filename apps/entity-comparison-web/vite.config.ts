@@ -1,9 +1,10 @@
 import react from '@vitejs/plugin-react'
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
+import { devLoginPlugin } from './devLoginPlugin.ts'
 
 // https://vite.dev/config/
-export default defineConfig({
-  plugins: [react()],
+export default defineConfig(({ mode }) => ({
+  plugins: [react(), devLoginPlugin(loadEnv(mode, process.cwd(), ''))],
   server: {
     host: '0.0.0.0',
     port: 5173,
@@ -11,4 +12,4 @@ export default defineConfig({
     proxy: { '/api': 'http://localhost:3001' },
   },
   preview: { port: 4173, strictPort: true },
-})
+}))

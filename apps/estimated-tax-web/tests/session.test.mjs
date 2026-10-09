@@ -124,3 +124,35 @@ test('provisioning rejection signs out and retains contact-admin error without r
   assert.equal(f.auth.user(), null)
   await assert.rejects(session.currentIdToken())
 })
+
+
+test('development sign-in runs once on signed-out startup and preserves restored portal users', async () => {
+  const f = fixture()
+  let count = 0
+  f.auth.developmentSignIn = async () => { count++; f.setUser(f.userFor('dev-test')) }
+  const session = createSession(f.auth)
+  const first = session.start(null, () => {})
+  assert.equal(session.start(null, () => {}), first)
+  await first
+  assert.equal(count, 1)
+  assert.deepEqual(session.snapshot(), { status: 'provision-pending', uid: 'dev-test' })
+  const restored = fixture(f.userFor('portal-user'))
+  restored.auth.developmentSignIn = async () => assert.fail('must retain portal identity')
+  const second = createSession(restored.auth)
+  await second.start(null, () => {})
+  assert.equal(second.snapshot().uid, 'portal-user')
+})
+
+test('portal handoff takes priority over development login; failures stay locked', async () => {
+  const f = fixture()
+  f.auth.developmentSignIn = async () => assert.fail('must not fall back')
+  const session = createSession(f.auth)
+  await session.start(Promise.resolve({ status: 'error', message: 'Invalid handoff' }), () => {})
+  assert.equal(session.snapshot().status, 'error')
+  const failing = fixture()
+  failing.auth.developmentSignIn = async () => { throw new Error('test failure') }
+  const failed = createSession(failing.auth)
+  await failed.start(null, () => {})
+  assert.equal(failed.snapshot().status, 'error')
+  await assert.rejects(failed.currentIdToken())
+})

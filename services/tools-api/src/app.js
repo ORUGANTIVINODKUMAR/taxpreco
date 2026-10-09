@@ -1,5 +1,7 @@
 const express = require('express')
 const cors = require('cors')
+const { devLoginConfig, createDevLoginHandler } = require('./devLogin')
+const { firebaseAuth } = require('./firebase')
 const { createContextRouter } = require('./routes/context')
 const { createToolsRouter } = require('./routes/tools')
 const { createMutualFundRouter } = require('./routes/mutualFund')
@@ -15,10 +17,13 @@ function allowedOrigins(value = process.env.CORS_ORIGINS) {
   return new Set(values)
 }
 
-function createApp({ verify, database, origins = allowedOrigins() } = {}) {
+function createApp({ verify, database, origins = allowedOrigins(), developmentLogin = devLoginConfig(), developmentAuth = firebaseAuth } = {}) {
   const app = express()
   app.use(cors({ origin(origin, callback) { callback(null, !!origin && origins.has(origin)) }, methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'], allowedHeaders: ['Authorization', 'Content-Type'] }))
   app.use(express.json())
+  if (developmentLogin) {
+    app.post('/api/dev/login', createDevLoginHandler({ config: developmentLogin, database: database || require('./db').pool, auth: developmentAuth }))
+  }
   const auth = createRequireAuth(verify)
   const context = createAttachContext(database)
   app.use('/api', createContextRouter(auth, context))

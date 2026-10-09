@@ -1,6 +1,7 @@
 import { getApps, initializeApp } from 'firebase/app'
 import { browserLocalPersistence, getAuth, onAuthStateChanged, setPersistence, signInWithCustomToken, signOut } from 'firebase/auth'
 import { createSession } from './session'
+import { devAutoLoginEnabled, developmentCustomToken } from './devLogin'
 
 function authInstance() {
   const env = import.meta.env
@@ -18,7 +19,19 @@ function authInstance() {
 }
 
 export const session = createSession({
-  restore: () => authInstance().authStateReady(),
+  restore: async () => {
+    const auth = authInstance()
+    await auth.authStateReady()
+    // A persisted development session must not survive disabling the feature.
+    if (!devAutoLoginEnabled && auth.currentUser) {
+      const token = await auth.currentUser.getIdTokenResult()
+      if (token.claims.taxpreco_dev_login === true) await signOut(auth)
+    }
+  },
+  developmentSignIn: devAutoLoginEnabled ? async () => {
+    const token = await developmentCustomToken()
+    await signInWithCustomToken(authInstance(), token)
+  } : undefined,
   persist: () => setPersistence(authInstance(), browserLocalPersistence),
   signIn: async (token) => { await signInWithCustomToken(authInstance(), token) },
   signOut: () => signOut(authInstance()),

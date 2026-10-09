@@ -5,6 +5,7 @@ export type SessionState =
   | { status: 'error'; message: string }
 
 export type AuthBoundary = {
+  developmentSignIn?: () => Promise<void>
   restore: () => Promise<void>
   persist: () => Promise<void>
   signIn: (token: string) => Promise<void>
@@ -65,12 +66,13 @@ export function createSession(auth: AuthBoundary) {
           } else {
             await auth.restore()
             await auth.persist()
+            if (!auth.user() && auth.developmentSignIn) await auth.developmentSignIn()
           }
           locked = false
           reflect()
         } catch {
-          if (handoff) await auth.signOut().catch(() => undefined)
-          publish({ status: 'error', message: 'Unable to establish a persistent Firebase session. Please open Mutual Fund from Tapreco again.' })
+          if (handoff || auth.developmentSignIn) await auth.signOut().catch(() => undefined)
+          publish({ status: 'error', message: !handoff && auth.developmentSignIn ? 'Development sign-in failed. Check the local tools-api, test-user provisioning and development configuration.' : 'Unable to establish a persistent Firebase session. Please open Mutual Fund from Tapreco again.' })
         }
       })()
     },

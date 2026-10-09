@@ -1,6 +1,7 @@
 import { defineConfig } from '@playwright/test'
 import { fileURLToPath } from 'node:url'
 const env = {
+  VITE_DEV_AUTO_LOGIN: 'false',
   VITE_PORTAL_URL: 'http://127.0.0.1:3099', VITE_APP_API_URL: 'http://127.0.0.1:3098',
   VITE_TOOLS_API_URL: 'http://127.0.0.1:4099', VITE_APP_FIREBASE_API_KEY: 'fake-api-key',
   VITE_APP_FIREBASE_AUTH_DOMAIN: 'maigha-taxpro.firebaseapp.com',
